@@ -1,0 +1,58 @@
+# AI Core Training Workflow v2 — fresh resource name to bypass K8s caching
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: fashion-inseason-train-v2
+  labels:
+    scenarios.ai.sap.com/id: "fashion-inseason-consumption"
+    executables.ai.sap.com/id: "fashion-inseason-train-v2"
+    ai.sap.com/version: "1.0.2"
+  annotations:
+    executables.ai.sap.com/name: "fashion-inseason-train-v2"
+spec:
+  imagePullSecrets:
+    - name: dockerhub-secret
+  entrypoint: main
+  templates:
+    - name: main
+      metadata:
+        labels:
+          ai.sap.com/resourcePlan: "starter"
+      container:
+        image: "docker.io/docprem/fashion-inseason-train:1.0.1"
+        imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            cpu: "0.5"
+            memory: "1Gi"
+          limits:
+            cpu: "2"
+            memory: "4Gi"
+        env:
+          - name: DL_DATA_PATH
+            value: "/tmp/data"
+          - name: OUTPUT_PATH
+            value: "/tmp/output"
+          - name: S3_ENDPOINT
+            value: "s3-eu-central-1.amazonaws.com"
+          - name: S3_BUCKET
+            value: "hcp-629e8333-8c9a-44e8-89cd-ce77dc07f3c8"
+          - name: S3_DATA_KEY
+            value: "fashion-contracts-ai/training/in-season/training_dataset_final.csv"
+          - name: S3_MODEL_PREFIX
+            value: "fashion-contracts-ai/models/in-season/"
+          - name: AWS_ACCESS_KEY_ID
+            valueFrom:
+              secretKeyRef:
+                name: fashion-s3-secret
+                key: AWS_ACCESS_KEY_ID
+          - name: AWS_SECRET_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: fashion-s3-secret
+                key: AWS_SECRET_ACCESS_KEY
+          - name: AWS_DEFAULT_REGION
+            valueFrom:
+              secretKeyRef:
+                name: fashion-s3-secret
+                key: AWS_DEFAULT_REGION
