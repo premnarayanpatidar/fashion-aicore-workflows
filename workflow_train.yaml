@@ -12,19 +12,21 @@ metadata:
   annotations:
     executables.ai.sap.com/name: "fashion-inseason-train"
 spec:
+  imagePullSecrets:
+    - name: dockerhub-secret
   entrypoint: main
   templates:
     - name: main
       metadata:
         labels:
-          ai.sap.com/resourcePlan: "train-s"
+          ai.sap.com/resourcePlan: "starter"
       container:
         image: "docker.io/docprem/fashion-inseason-train:1.0.1"
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         resources:
           requests:
-            cpu: "1"
-            memory: "2Gi"
+            cpu: "0.5"
+            memory: "1Gi"
           limits:
             cpu: "2"
             memory: "4Gi"
