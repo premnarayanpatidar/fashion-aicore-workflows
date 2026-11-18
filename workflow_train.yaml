@@ -17,7 +17,7 @@ spec:
     - name: main
       metadata:
         labels:
-          ai.sap.com/resourcePlan: "basic"
+          ai.sap.com/resourcePlan: "train-s"
       container:
         image: "docker.io/docprem/fashion-inseason-train:1.0.1"
         imagePullPolicy: Always
