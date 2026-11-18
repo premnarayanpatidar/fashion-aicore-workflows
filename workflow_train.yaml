@@ -22,6 +22,7 @@ spec:
           ai.sap.com/resourcePlan: "starter"
       container:
         image: "docker.io/docprem/fashion-inseason-train:1.0.1"
+        command: ["python", "train.py"]
         imagePullPolicy: IfNotPresent
         resources:
           requests:
