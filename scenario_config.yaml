@@ -1,0 +1,55 @@
+# AI Core Scenario Registration — Fashion In-Season Consumption Model
+# Use this as a reference for registering via ISLM F4469 (Side-by-Side).
+# Prerequisite: APL/PAL Basis fix applied (see WS2-03 Part B note).
+
+scenario:
+  id:          "fashion-inseason-consumption"
+  name:        "fashion-inseason-consumption"
+  description: "Predicts final season consumption % for wholesale purchase contracts"
+
+# Executables registered via workflow YAMLs (workflow_train.yaml / workflow_serve.yaml)
+executables:
+  training:
+    id:          "fashion-inseason-train"
+    kind:        AiTrainingTemplate
+    description: "XGBoost in-season consumption model training"
+    artifact_name: "trained-model"
+
+  serving:
+    id:          "fashion-inseason-serve"
+    kind:        AiServingTemplate
+    description: "FastAPI inference server for in-season consumption prediction"
+    inference_endpoint: "/v1/predict"
+
+# ISLM Side-by-Side registration (F4469 fields — WS2-03 Part B)
+islm_registration:
+  scenario_name:       "FSH_CONT_CONS_PRED"
+  scenario_type:       "Side-by-Side"
+  ml_service_provider: "SAP AI Core"
+  resource_group:      "fashion-contracts"
+  business_app:        "F2012"      # Quantity Contract Consumption
+  sap_package:         "FSH_ML"
+  inference_path:      "/v1/predict"
+  http_method:         "POST"
+
+# Input fields (must match ContractFeatures pydantic model in inference/server.py)
+inputs:
+  - name: CONTRACT_ID           type: String   description: "Purchase contract number"
+  - name: WEEK_NUMBER           type: Integer  description: "Week number within the season"
+  - name: YTD_CONSUMPTION_PCT   type: Decimal  description: "Year-to-date consumption %"
+  - name: RELEASE_VELOCITY      type: Decimal  description: "Average weekly release rate"
+  - name: WEEKS_REMAINING       type: Integer  description: "Weeks to season end"
+  - name: PCT_SEASON_ELAPSED    type: Decimal  description: "% of season elapsed"
+  - name: TARGET_QUANTITY       type: Decimal  description: "Contract target quantity"
+  - name: PURCHASING_CATEGORY   type: String   description: "Material group / category"
+  - name: PURCHASING_ORG        type: String   description: "Purchasing organization"
+  - name: SEASON_TYPE           type: String   description: "SS or AW"
+
+# Output fields (must match PredictionResult pydantic model in inference/server.py)
+outputs:
+  - name: PREDICTED_CONSUMPTION_PCT  type: Decimal  description: "Predicted final consumption %"
+  - name: PREDICTED_CONSUMED_QTY     type: Decimal  description: "Predicted consumed quantity"
+  - name: PREDICTED_UNCONSUMED_QTY   type: Decimal  description: "Predicted unconsumed quantity"
+  - name: OVER_PLANNING_RISK_PCT     type: Decimal  description: "Over-planning risk %"
+  - name: RISK_LEVEL                 type: String   description: "HIGH / MEDIUM / LOW"
+  - name: MODEL_CONFIDENCE           type: Decimal  description: "0–1 confidence score"
