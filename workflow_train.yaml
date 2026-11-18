@@ -17,17 +17,17 @@ spec:
     - name: main
       metadata:
         labels:
-          ai.sap.com/resourcePlan: "starter"
+          ai.sap.com/resourcePlan: "basic"
       container:
         image: "docker.io/docprem/fashion-inseason-train:1.0.1"
         imagePullPolicy: Always
         resources:
           requests:
+            cpu: "1"
+            memory: "2Gi"
+          limits:
             cpu: "2"
             memory: "4Gi"
-          limits:
-            cpu: "4"
-            memory: "8Gi"
         env:
           - name: DL_DATA_PATH
             value: "/tmp/data"
